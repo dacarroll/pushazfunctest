@@ -1,6 +1,11 @@
 {
-    "schedule": "0 */5 * * * *",
-    "name": "timer",
-    "type": "timerTrigger",
-    "direction": "in"
+    "bindings": 
+    [
+        {
+            "schedule": "0 5 * * * *",
+            "name": "timer",
+            "type": "timerTrigger",
+            "direction": "in"
+        }
+    ]
 }
