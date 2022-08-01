@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - './Functions/*'
+      - './Functions/**'
   workflow_dispatch:
 
 env:
