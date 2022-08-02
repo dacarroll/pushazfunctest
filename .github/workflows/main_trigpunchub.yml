@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - 'Functions/**'
+      - 'Functions/trigpunchhub'
   workflow_dispatch:
 
 env:
@@ -28,4 +28,4 @@ jobs:
           app-name: 'trigpunchub'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CE3F7F11A6674398B3E5F6AEEF893D0B }}
+          publish-profile: ${{ secrets.TRIGPUNCHHUB }}
