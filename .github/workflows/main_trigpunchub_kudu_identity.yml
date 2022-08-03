@@ -33,6 +33,6 @@ jobs:
           $userAgent = 'powershell/1.0'
           $urlzip = 'https://trigpunchub.scm.azurewebsites.net/zipdeploy'
           $applocation = (Get-ChildItem "C:\actions-runner\_work\pushazfunctest\pushazfunctest\").fullname
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,C:\actions-runner\_work\_temp\pushazfunctest.zip)
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,'C:\actions-runner\_work\_temp\pushazfunctest.zip')
           Invoke-WebRequest -Uri $urlzip -Headers @{Authorization="Bearer $token"} -UserAgent $userAgent -Method PUT -InFile "C:\actions-runner\_work\_temp\pushazfunctest.zip" -ContentType "multipart/form-data" -Verbose
           "Yes this is working"
