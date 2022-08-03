@@ -21,10 +21,11 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
-      - name: 'Run Az Login'
-        shell: PowerShell
-        run: |
-          Connect-AzAccount -Identity
+      - name: "Azure login"
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          enable-AzPSSession: true
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
