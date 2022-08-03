@@ -24,7 +24,6 @@ jobs:
       - name: 'Run Az Login'
         shell: PowerShell
         run: |
-          Get-Module -ListAvailable
           Connect-AzAccount -Identity
 
       - name: 'Run Azure Functions Action'
