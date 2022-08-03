@@ -30,6 +30,7 @@ jobs:
       - name: 'Custom Kudu'
         shell: PowerShell
         run: |
+          try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { }
           $userAgent = 'powershell/1.0'
           $urlzip = 'https://trigpunchub.scm.azurewebsites.net/zipdeploy'
           $applocation = (Get-ChildItem "C:\actions-runner\_work\pushazfunctest\pushazfunctest\").fullname
