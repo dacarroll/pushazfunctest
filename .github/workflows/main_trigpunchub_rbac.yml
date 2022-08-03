@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 'Run Az Login'
-        shell: pwsh
+        shell: PowerShell
         run: |
           Get-Module -ListAvailable
           Connect-AzAccount -Identity
