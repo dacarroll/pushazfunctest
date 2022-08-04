@@ -42,8 +42,8 @@ jobs:
               Uri = $urlzip 
               Headers = @{Authorization="Bearer $token"} 
               UserAgent = $userAgent 
-              Method PUT 
-              InFile "C:\actions-runner\_work\_temp\pushazfunctest.zip" 
+              Method = PUT 
+              InFile = "C:\actions-runner\_work\_temp\pushazfunctest.zip" 
               ContentType = "multipart/form-data"
             }
             try { Invoke-WebRequest  -Verbose -UseBasicParsing }
