@@ -25,7 +25,8 @@ jobs:
         shell: PowerShell
         run: |
           Connect-AzAccount -Identity
-          $token = (Get-AzAccessToken).token
+          #$token = (Get-AzAccessToken).token
+          env
 
       - name: 'Custom Kudu'
         shell: PowerShell
