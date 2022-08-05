@@ -21,12 +21,15 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
+      - name: 'Show Environment'
+        run: |
+          echo "$GITHUB_CONTEXT"
+
       - name: 'Run Az Login'
         shell: PowerShell
         run: |
           Connect-AzAccount -Identity
           #$token = (Get-AzAccessToken).token
-          env
 
       - name: 'Custom Kudu'
         shell: PowerShell
