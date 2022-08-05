@@ -23,7 +23,7 @@ jobs:
 
       - name: 'Show Environment'
         run: |
-          echo "$GITHUB_CONTEXT"
+          echo "$env:GITHUB_CONTEXT"
           echo "$GITHUB_REPOSITORY"
 
       - name: 'Run Az Login'
