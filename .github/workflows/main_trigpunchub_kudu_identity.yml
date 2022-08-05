@@ -22,9 +22,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 'Show Environment'
-        run: |
-          echo "$env:GITHUB_CONTEXT"
-          echo "$GITHUB_REPOSITORY"
+        run: $env
 
       - name: 'Run Az Login'
         shell: PowerShell
