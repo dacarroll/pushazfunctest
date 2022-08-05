@@ -24,6 +24,7 @@ jobs:
       - name: 'Show Environment'
         run: |
           echo "$GITHUB_CONTEXT"
+          echo "$GITHUB_REPOSITORY"
 
       - name: 'Run Az Login'
         shell: PowerShell
