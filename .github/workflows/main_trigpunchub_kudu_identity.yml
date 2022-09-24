@@ -45,7 +45,7 @@ jobs:
             $functionApp = $env:commitmsg.split(" ")[0]
             $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
             $urlzip = $functionURL
-            $applocation = [string]::concat($env:GITHUB_WORKSPACE,'Functions\',$functionApp)
+            $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
             Write-Output $applocation
             $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
             [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
