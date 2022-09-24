@@ -17,36 +17,44 @@ env:
 
 jobs:
   build-and-deploy:
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
     runs-on: self-hosted
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
       - name: 'Show Environment'
-        run: $env
+        run: |
+          dir env:
+          ("The Change is in {0}" -f $env:commitmsg.split(" ")[0])
+        shell: pwsh
 
       - name: 'Run Az Login'
-        shell: PowerShell
+        shell: pwsh
         run: |
           Connect-AzAccount -Identity
           #$token = (Get-AzAccessToken).token
 
       - name: 'Custom Kudu'
-        shell: PowerShell
+        shell: pwsh
         run: |
           try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { }
           try { $token = (Get-AzAccessToken).token } catch { }
           if ($token) {
-            $urlzip = 'https://trigpunchub.scm.azurewebsites.net/zipdeploy'
-            $applocation = "C:\actions-runner\_work\pushazfunctest\pushazfunctest\Functions\trigpunchhub"
+            $functionApp = $env:commitmsg.split(" ")[0]
+            $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
+            $urlzip = $functionURL
+            $applocation = [string]::concat($env:GITHUB_WORKSPACE,'Functions\',$functionApp)
             Write-Output $applocation
-            [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,'C:\actions-runner\_work\_temp\pushazfunctest.zip')
+            $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
+            [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
             $invoke_params = @{
               Uri = $urlzip 
               Headers = @{Authorization="Bearer $token"} 
               UserAgent = 'powershell/1.0'
               Method = 'PUT'
-              InFile = "C:\actions-runner\_work\_temp\pushazfunctest.zip" 
+              InFile = $zipOutput 
               ContentType = "multipart/form-data"
             }
             try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
