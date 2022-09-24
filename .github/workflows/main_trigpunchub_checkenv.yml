@@ -13,6 +13,8 @@ on:
 
 jobs:
   build-and-deploy:
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
     runs-on: self-hosted
     steps:
       - name: 'Checkout GitHub Action'
@@ -21,5 +23,5 @@ jobs:
       - name: 'Show Environment'
         run: |
           dir env:
-          $env:GITHUB_event
+          $env:commitmsg
         shell: pwsh
