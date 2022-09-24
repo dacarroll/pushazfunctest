@@ -37,7 +37,6 @@ jobs:
           try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { }
           try { $token = (Get-AzAccessToken).token } catch { }
           if ($token) {
-            $userAgent = 'powershell/1.0'
             $urlzip = 'https://trigpunchub.scm.azurewebsites.net/zipdeploy'
             $applocation = "C:\actions-runner\_work\pushazfunctest\pushazfunctest\Functions\trigpunchhub"
             Write-Output $applocation
@@ -45,7 +44,7 @@ jobs:
             $invoke_params = @{
               Uri = $urlzip 
               Headers = @{Authorization="Bearer $token"} 
-              UserAgent = $userAgent 
+              UserAgent = 'powershell/1.0'
               Method = 'PUT'
               InFile = "C:\actions-runner\_work\_temp\pushazfunctest.zip" 
               ContentType = "multipart/form-data"
