@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Powershell project to Azure Function App - trigpunchub
+name: Function Deployments
 
 on:
   push:
@@ -20,5 +20,4 @@ jobs:
 
       - name: 'Show Environment'
         shell: pwsh
-        run: |
-          dir env:
+        run: dir env:
