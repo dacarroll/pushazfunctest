@@ -21,4 +21,5 @@ jobs:
       - name: 'Show Environment'
         run: |
           dir env:
+          $env:github.event
         shell: pwsh
