@@ -1,0 +1,28 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Powershell project to Azure Function App - trigpunchub
+
+on:
+  push:
+    branches:
+      - dan
+    paths:
+      - 'Functions/**'
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './Functions/trigpunchhub' # set this to the path to your web app project, defaults to the repository root
+  AZURE_OtherFunction: './Functions'
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+
+      - name: 'Show Environment'
+        shell: PowerShell
+        run: |
+          dir env:
