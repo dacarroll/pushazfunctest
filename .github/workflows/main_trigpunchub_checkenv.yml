@@ -11,8 +11,6 @@ on:
       - 'Functions/**'
   workflow_dispatch:
 
-env:
-
 jobs:
   build-and-deploy:
     runs-on: self-hosted
