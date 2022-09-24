@@ -24,6 +24,7 @@ jobs:
       
       - run: |
           git show --name-only
+          git diff
 
       - name: 'Show Environment'
         run: |
