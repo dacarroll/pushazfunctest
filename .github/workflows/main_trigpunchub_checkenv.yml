@@ -19,5 +19,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 'Show Environment'
-        run: dir env:
+        run: |
+          dir env:
         shell: pwsh
