@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - dan
-    paths:
-      - 'Functions/**'
   workflow_dispatch:
 
 env:
