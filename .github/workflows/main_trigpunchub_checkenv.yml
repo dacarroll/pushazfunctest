@@ -23,5 +23,5 @@ jobs:
       - name: 'Show Environment'
         run: |
           dir env:
-          $env:commitmsg
+          ("The Change is in {0}" -f $env:commitmsg.split(" ")[0])
         shell: pwsh
