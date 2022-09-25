@@ -75,7 +75,8 @@ jobs:
           try { $token = (Get-AzAccessToken).token } catch { Break }
 
           if ($token) {
-            $functionApps = $env:Functions_Update
+            $functionApps_str = $env:Functions_Update
+            $functionApps = $functionApps_str.Split(" ")
             foreach ($functionApp in $functionApps) {
               $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
               
