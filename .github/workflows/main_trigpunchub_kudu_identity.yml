@@ -27,7 +27,7 @@ jobs:
         run: |
           # Checking if first run
           if (!(Test-Path $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt)) {
-            New-Item $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+            New-Item $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt -Force
 
             # Since first run checking last 3 commits for commit changes
               $Commits = git log -n 3 -- ./Functions | Select-String "commit \w*"
