@@ -48,8 +48,8 @@ jobs:
             Write-Output "$ChangedFiles"
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
             $Functions_ToUpdate = $Apps | select -Unique
-            Write-Output "$Functions_ToUpdate"
-            Write-Output "$Functions_Update=$Functions_ToUpdate" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+            #Write-Output "$Functions_ToUpdate"
+            #Write-Output "$Functions_Update=$Functions_ToUpdate" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
           }
 
       - name: 'Show Environment'
