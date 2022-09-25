@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
       
       - name: 'File Differences'
-      - run: |
+        run: |
           git show --name-only
 
       - name: 'Show Environment'
