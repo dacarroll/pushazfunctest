@@ -47,7 +47,7 @@ jobs:
           if ($ChangedFiles) {
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
             $Functions_ToUpdate = $Apps | select -Unique
-            $Functions_ToUpdate >> $env:GITHUB_ENV
+            Write-Output $Functions_ToUpdate | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
           }
 
       - name: 'Show Environment'
