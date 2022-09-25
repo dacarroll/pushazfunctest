@@ -47,7 +47,7 @@ jobs:
 
           # Setting all function apps with changes to the environment
           if ($ChangedFiles) {
-            $ChangeFiles | Foreach { Write-Output ("Files Changed: {0}" $PSItem) }
+            $ChangeFiles | Foreach { Write-Output ("Files Changed: {0}" -f $PSItem) }
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
             $Functions_ToUpdate = $Apps | select -Unique
             $Functions_ToUpdate | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
