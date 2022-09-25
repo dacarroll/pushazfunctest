@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - feature/functions
     paths:
       - 'Functions/**'
 
@@ -22,42 +23,72 @@ jobs:
           fetch-depth: 0
       
       - name: 'File Differences'
+        shell: pwsh
         run: |
-          git show --name-only
+          # Checking if first run
+          if (!(Test-Path $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt)) {
+            New-Item $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+
+            # Since first run checking last 3 commits for commit changes
+              $Commits = git log -n 3 -- ./Functions | Select-String "commit \w*"
+              $Commits = $Commits | foreach { $PSItem.Matches.Value.split(" ")[1] }
+              $ChangedFiles = git diff --name-only $Commits[0] $Commits[2]
+
+            # Finally writting current commit to history for all subsequent runs
+              $Commits[0] >> $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+          }
+          else {
+            # Not first run collecting last commit from file 
+            $Commit = Get-Content $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+            $ChangedFiles = git diff --name-only $env:GITHUB_SHA $Commit
+          }
+
+          # Setting all function apps with changes to the environment
+          if ($ChangedFiles) {
+            $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
+            $Functions_ToUpdate = $Apps | select -Unique
+            $Functions_ToUpdate >> $env:GITHUB_ENV
+          }
 
       - name: 'Show Environment'
+        shell: pwsh
         run: |
           dir env:
           ("The Change is in {0}" -f $env:commitmsg.split(" ")[0])
-        shell: pwsh
+
 
       - name: 'Run Az Login'
         shell: pwsh
         run: |
           Connect-AzAccount -Identity
-          #$token = (Get-AzAccessToken).token
 
       - name: 'Custom Kudu'
         shell: pwsh
         run: |
-          try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { }
-          try { $token = (Get-AzAccessToken).token } catch { }
+          # Prep Environment for Zip Operation
+          try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { Break }
+          # Generate and access token
+          try { $token = (Get-AzAccessToken).token } catch { Break }
+
           if ($token) {
-            $functionApp = $env:commitmsg.split(" ")[0]
-            $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
-            $urlzip = $functionURL
-            $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
-            Write-Output $applocation
-            $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
-            [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
-            $invoke_params = @{
-              Uri = $urlzip 
-              Headers = @{Authorization="Bearer $token"} 
-              UserAgent = 'powershell/1.0'
-              Method = 'PUT'
-              InFile = $zipOutput 
-              ContentType = "multipart/form-data"
+            $functionApps = $env:Functions_ToUpdate
+            foreach ($functionApp in $functionApps) {
+              $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
+              
+              $urlzip = $functionURL
+              
+              $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
+              $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
+              [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
+              $invoke_params = @{
+                Uri = $urlzip 
+                Headers = @{Authorization="Bearer $token"} 
+                UserAgent = 'powershell/1.0'
+                Method = 'PUT'
+                InFile = $zipOutput 
+                ContentType = "multipart/form-data"
+              }
+              try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
+              catch { $_ }
             }
-            try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
-            catch { $_ }
           }
