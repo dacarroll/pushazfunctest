@@ -1,8 +1,21 @@
 # pushazfunctest
 
-## Testing update outside of workflow location
+## Onboarding
 
-1. first attempt with updated yml
-2. Adjust
-3. one more adjust
-3. Other Things are in here too
+- Create directory structure
+
+## Making commits
+
+- Direct to feature branch
+- Pull request
+
+- Runner RBAC Permissions
+
+## Limitation
+
+- Workflow code diff check between current commit SHA and previous commit SHA will not identify a change if the add or delete of a function is identical between commits
+- function 
+
+
+
+##
