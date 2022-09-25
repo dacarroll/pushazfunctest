@@ -47,7 +47,7 @@ jobs:
 
           # Setting all function apps with changes to the environment
           if ($ChangedFiles) {
-            $ChangeFiles | Foreach { Write-Output ("Files Changed: {0}" -f $PSItem) }
+            $ChangedFiles | Foreach { Write-Output ("Files Changed: {0}" -f $PSItem) }
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
             $Functions_ToUpdate = $Apps | select -Unique
             $Functions_ToUpdate | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
@@ -69,31 +69,33 @@ jobs:
       - name: 'Custom Kudu'
         shell: pwsh
         run: |
-          # Prep Environment for Zip Operation
-          try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { Break }
-          # Generate and access token
-          try { $token = (Get-AzAccessToken).token } catch { Break }
+          if ($env:Functions_Update) {
+            # Prep Environment for Zip Operation
+            try { Add-Type -AssemblyName System.IO.Compression.FileSystem } catch { Break }
+            # Generate and access token
+            try { $token = (Get-AzAccessToken).token } catch { Break }
 
-          if ($token) {
-            $functionApps_str = $env:Functions_Update
-            $functionApps = $functionApps_str.Split(" ")
-            foreach ($functionApp in $functionApps) {
-              $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
-              
-              $urlzip = $functionURL
-              
-              $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
-              $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
-              [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
-              $invoke_params = @{
-                Uri = $urlzip 
-                Headers = @{Authorization="Bearer $token"} 
-                UserAgent = 'powershell/1.0'
-                Method = 'PUT'
-                InFile = $zipOutput 
-                ContentType = "multipart/form-data"
+            if ($token) {
+              $functionApps_str = $env:Functions_Update
+              $functionApps = $functionApps_str.Split(" ")
+              foreach ($functionApp in $functionApps) {
+                $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
+                
+                $urlzip = $functionURL
+                
+                $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
+                $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
+                [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
+                $invoke_params = @{
+                  Uri = $urlzip 
+                  Headers = @{Authorization="Bearer $token"} 
+                  UserAgent = 'powershell/1.0'
+                  Method = 'PUT'
+                  InFile = $zipOutput 
+                  ContentType = "multipart/form-data"
+                }
+                try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
+                catch { $_ }
               }
-              try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
-              catch { $_ }
             }
           }
