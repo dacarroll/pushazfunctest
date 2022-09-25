@@ -42,17 +42,16 @@ jobs:
             $Commit = Get-Content $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
             $ChangedFiles = git diff --name-only $env:GITHUB_SHA $Commit -- ./Functions
 
-            $Commit > $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+            $env:GITHUB_SHA > $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
           }
 
           # Setting all function apps with changes to the environment
           if ($ChangedFiles) {
-            Write-Output "$ChangedFiles"
+            $ChangeFiles | Foreach { Write-Output ("Files Changed: {0}" $PSItem) }
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
             $Functions_ToUpdate = $Apps | select -Unique
-            Write-Output "$Functions_ToUpdate"
-            Write-Output "Functions_Update=$Functions_ToUpdate" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
-            "myTest=Test" >> $env:GITHUB_ENV
+            $Functions_ToUpdate | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
+            "Functions_Update=$Functions_ToUpdate" >> $env:GITHUB_ENV
           }
 
       - name: 'Show Environment'
