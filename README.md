@@ -11,7 +11,8 @@ Onboarding a repository requires some setup in both Azure and the repository.
 
 ### Azure Functions
 
-- Enable Soure Control
+- Enable Soure Control such as GitHub
+  - Another option is to set the application to Read-Only via WEBSITE_RUN_FROM_PACKAGE
 - Assign RBAC permissions to the Runner Managed Identity
 
 ### Github Repository
