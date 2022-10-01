@@ -93,3 +93,6 @@ jobs:
               }
             }
           }
+          else {
+            Write-Output "No Function files that have been Modified, Added, or Deleted. Note: Deletes are not supported on the entire function"
+          }
