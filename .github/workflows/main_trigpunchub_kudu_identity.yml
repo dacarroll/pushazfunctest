@@ -108,7 +108,7 @@ jobs:
                   catch { $_ }
                 }
                 else {
-                  "Write-Output ("Couldn't find the path: {0}" -f $applocation)
+                  Write-Output ("Couldn't find the path: {0}" -f $applocation)
                 }
               }
             }
