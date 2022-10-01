@@ -28,31 +28,47 @@ jobs:
         run: |
           # Checking if first run
           if (!(Test-Path $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt)) {
+            Write-Output "Workflow first time running on this node: Need to setup tools dir."
             New-Item $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt -Force
 
             # Since first run checking last 2 commits for commit changes
               $Commits = git log -n 2 | Select-String "commit \w*"
               $Commits = $Commits | foreach { $PSItem.Matches.Value.split(" ")[1] }
-              $ChangedFiles = git diff --name-only $Commits[0] $Commits[1] --diff-filter d
+              $ChangedFiles = git diff --name-only $Commits[1] --no-renames -- ./Functions
 
             # Finally writting current commit to history for all subsequent runs
-              $Commits[0] >> $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+              if (Test-Path $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt ) {
+                Write-Output "Setting node with latest function for ease of follow on runs"
+                $Commits[0] >> $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+              }
           }
           else {
             # Not first run collecting last commit from file 
             $Commit = Get-Content $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
-            $ChangedFiles = git diff --name-only $env:GITHUB_SHA $Commit -- ./Functions
+            $ChangedFiles = git diff --name-only $Commit --no-renames -- ./Functions
 
+            # Updating the tool cache with last commit for follow on runs 
             $env:GITHUB_SHA > $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
+
           }
 
           # Setting all function apps with changes to the environment
           if ($ChangedFiles) {
             $ChangedFiles | Foreach { Write-Output ("Files Changed: {0}" -f $PSItem) }
             $Apps = $ChangedFiles | foreach { $PSItem.Split('/')[1] }
-            $Functions_ToUpdate = $Apps | select -Unique
-            $Functions_ToUpdate | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
-            "Functions_Update=$Functions_ToUpdate" >> $env:GITHUB_ENV
+            $Apps = $Apps | select -Unique
+            # Substep for ensuring the app with modified files hasn't been completly removed
+            $Apps_Control = [System.Collections.Generic.List[string]]::New()
+            foreach ($App in $Apps) {
+              if (Test-Path ./Functions/$App) {
+                $Apps_Control.add($App)
+              }
+              else {
+                Write-Output ("Function: {0} has been completely removed from repository, Will not be sending an update to this app" -f $App)
+              }
+            }
+            $Apps_Control | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
+            "Functions_Update=$Apps_Control" >> $env:GITHUB_ENV
           }
 
       - name: 'Run Az Login'
@@ -74,22 +90,26 @@ jobs:
               $functionApps = $functionApps_str.Split(" ")
               foreach ($functionApp in $functionApps) {
                 $functionURL = [string]::concat('https://',$functionApp,'.scm.azurewebsites.net/zipdeploy')
-                
-                $urlzip = $functionURL
-                
                 $applocation = [string]::concat($env:GITHUB_WORKSPACE,'\','Functions\',$functionApp)
                 $zipOutput = [string]::concat($env:RUNNER_TEMP,'\',$functionApp,'.zip')
-                [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
-                $invoke_params = @{
-                  Uri = $urlzip 
-                  Headers = @{Authorization="Bearer $token"} 
-                  UserAgent = 'powershell/1.0'
-                  Method = 'PUT'
-                  InFile = $zipOutput 
-                  ContentType = "multipart/form-data"
+
+                # Verify function app exists, else it will fail
+                if (Test-Path $applocation) {
+                  [System.IO.Compression.ZipFile]::CreateFromDirectory($applocation,$zipOutput)
+                  $invoke_params = @{
+                    Uri = $functionURL
+                    Headers = @{Authorization="Bearer $token"} 
+                    UserAgent = 'powershell/1.0'
+                    Method = 'PUT'
+                    InFile = $zipOutput 
+                    ContentType = "multipart/form-data"
+                  }
+                  try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
+                  catch { $_ }
                 }
-                try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
-                catch { $_ }
+                else {
+                  "Write-Output ("Couldn't find the path: {0}" -f $applocation)"
+                }
               }
             }
           }
