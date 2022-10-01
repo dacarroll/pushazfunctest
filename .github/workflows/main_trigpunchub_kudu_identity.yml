@@ -1,12 +1,8 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Functions
 
 on:
   push:
     branches:
-      - main
       - feature/functions
     paths:
       - 'Functions/**'
@@ -21,7 +17,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      
+
+      - name: 'Show Environment'
+        shell: pwsh
+        run: |
+          ("The Change is in {0}" -f $env:commitmsg.split(" ")[0])
+
       - name: 'File Differences'
         shell: pwsh
         run: |
@@ -29,10 +30,10 @@ jobs:
           if (!(Test-Path $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt)) {
             New-Item $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt -Force
 
-            # Since first run checking last 3 commits for commit changes
-              $Commits = git log -n 3 -- ./Functions | Select-String "commit \w*"
+            # Since first run checking last 2 commits for commit changes
+              $Commits = git log -n 2 | Select-String "commit \w*"
               $Commits = $Commits | foreach { $PSItem.Matches.Value.split(" ")[1] }
-              $ChangedFiles = git diff --name-only $Commits[0] $Commits[2]
+              $ChangedFiles = git diff --name-only $Commits[0] $Commits[1] --diff-filter d
 
             # Finally writting current commit to history for all subsequent runs
               $Commits[0] >> $env:RUNNER_TOOL_CACHE\FuncCommits\lstwkflowcmt.txt
@@ -53,13 +54,6 @@ jobs:
             $Functions_ToUpdate | Foreach { Write-Output ("Updating Function App: {0} " -f $PSItem) }
             "Functions_Update=$Functions_ToUpdate" >> $env:GITHUB_ENV
           }
-
-      - name: 'Show Environment'
-        shell: pwsh
-        run: |
-          dir env:
-          ("The Change is in {0}" -f $env:commitmsg.split(" ")[0])
-
 
       - name: 'Run Az Login'
         shell: pwsh
