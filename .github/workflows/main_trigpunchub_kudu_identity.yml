@@ -104,8 +104,11 @@ jobs:
                     InFile = $zipOutput 
                     ContentType = "multipart/form-data"
                   }
-                  try { Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing }
-                  catch { $_ }
+                  try { $msg = Invoke-WebRequest @invoke_params -Verbose -UseBasicParsing 
+                    if ($msg.StatusCode -eq 200) { ("{0}: Update Successful" -f $functionApp) }
+                  }
+                  catch [System.Net.Http.HttpRequestException] { ("While updating App {0} received error: {1}" -f $functionApp, $PSItem.Exception.Response.StatusCode.value__) }
+                  catch {("While updating App {0} Unhandled error" -f $functionApp)}
                 }
                 else {
                   Write-Output ("Couldn't find the path: {0}" -f $applocation)
