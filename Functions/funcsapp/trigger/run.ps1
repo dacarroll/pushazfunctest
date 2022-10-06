@@ -19,7 +19,7 @@ if ($name) {
 }
 #No real updates
 Get-ChildItem -Path .
-dir env:
+(dir env:).key
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
