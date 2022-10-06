@@ -17,7 +17,7 @@ $body = "This HTTP triggered function executed successfully. Pass a name in the 
 if ($name) {
     $body = "Hello, $name. This HTTP triggered function executed successfully."
 }
-
+#No real updates
 Get-ChildItem -Path .
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
