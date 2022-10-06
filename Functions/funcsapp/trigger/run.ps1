@@ -18,13 +18,22 @@ if ($name) {
     $body = "Hello, $name. This HTTP triggered function executed successfully."
 }
 #No real updates
-Get-ChildItem -Path .
-$AllEnv = dir env:
-foreach ($a in $AllEnv){
-    [pscustomobject]@{
-        Key = $A.Key
-        Val = $A.Value
-    }
+if (!(Test-Path $env:Home\Data\log.txt)) {
+    Write-Output "First Run experience collecting all logs"
+    New-Item $env:Home\Data\Log.txt
+}
+else {
+    Write-Output "Checking current time and last success"
+    Get-Content $env:Home\Data\Log.txt
+}
+
+$LogText = [pscustomobject]@{
+    LastRun = [datetime]::UtcNow.ToString('o')
+    CurrentRun = [datetime]::UtcNow.ToString('o')
+}
+
+if ($success) {
+    $LogText | Export-Csv -Path $env:Home\Data\Log.txt
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
