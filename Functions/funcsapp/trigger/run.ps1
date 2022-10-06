@@ -31,7 +31,7 @@ $LogText = [pscustomobject]@{
     LastRun = [datetime]::UtcNow.ToString('o')
     CurrentRun = [datetime]::UtcNow.ToString('o')
 }
-
+$success = $true
 if ($success) {
     $LogText | Export-Csv -Path $env:Home\Data\Log.txt
 }
