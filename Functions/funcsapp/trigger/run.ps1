@@ -22,8 +22,8 @@ Get-ChildItem -Path .
 $AllEnv = dir env:
 foreach ($a in $AllEnv){
     [pscustomobject]@{
-        Key = $AllEnv.Key
-        Val = $AllEnv.Value
+        Key = $A.Key
+        Val = $A.Value
     }
 }
 
