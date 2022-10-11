@@ -9,7 +9,7 @@ Write-Host "PowerShell HTTP trigger function processed a request."
 # Interact with query parameters or the body of the request.
 Write-Host "LogData"
 $LogData
-
+#Testing Now
 $body = $LogData.Body
 $body
 $ctx = New-AzStorageContext -ConnectionString $env:AzureWebJobStorage
