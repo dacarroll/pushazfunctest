@@ -17,24 +17,13 @@ $body = "This HTTP triggered function executed successfully. Pass a name in the 
 if ($name) {
     $body = "Hello, $name. This HTTP triggered function executed successfully."
 }
-#No real updates
-if (!(Test-Path $env:Home\Data\log.txt)) {
-    Write-Output "First Run experience collecting all logs"
-    New-Item $env:Home\Data\Log.txt
-}
-else {
-    Write-Output "Checking current time and last success"
-    Get-Content $env:Home\Data\Log.txt
-}
 
-$LogText = [pscustomobject]@{
-    LastRun = [datetime]::UtcNow.ToString('o')
-    CurrentRun = [datetime]::UtcNow.ToString('o')
-}
-$success = $true
-if ($success) {
-    $LogText | Export-Csv -Path $env:Home\Data\Log.txt
-}
+[pscutomobject]@{
+    Name = $name
+} | ConvertTo-Json | Out-File $env:TEMP\log.json
+
+
+
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
