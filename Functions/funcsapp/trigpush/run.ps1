@@ -13,8 +13,8 @@ $LogData
 Write-Host "TriggerMetadata"
 $TriggerMetadata
 
-$body = "Bam"
-
+$body = $LogData.Body
+$body
 $ctx = New-AzStorageContext -ConnectionString $env:AzureWebJobStorage
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
