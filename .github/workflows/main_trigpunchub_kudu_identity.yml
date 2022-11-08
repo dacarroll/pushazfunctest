@@ -9,6 +9,7 @@ on:
 
 jobs:
   publish_functions:
+    environment: 'TestEnv'
     env:
       commitmsg: ${{ github.event.head_commit.message }}
     runs-on: self-hosted
